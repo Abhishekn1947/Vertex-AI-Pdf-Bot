@@ -1,6 +1,6 @@
 # Vertex-AI-Pdf-Bot
 
-This project, named "Mr.DOC," is a Streamlit-based web application that integrates Google Cloud Vertex AI to provide a powerful Q&A system for your PDF documents. By simply uploading a PDF and posing questions, the system can extract relevant answers using advanced machine learning models and efficient document retrieval methods. 
+This project, named "Mr.DOC," is a Streamlit-based web application that integrates Google Cloud Vertex AI to provide a powerful Q&A system for your PDF documents. By simply uploading a PDF and posing questions, the system can extract relevant answers using advanced machine learning models and efficient document retrieval methods. Pdf size limit = 200MB (Which is more than enough for most pdfs). 
 
 # Dm if you would like an Custom Industry Scalable version for your company with an even better fine-tuned model for multiple use-cases. 
 
