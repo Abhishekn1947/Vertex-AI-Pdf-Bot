@@ -1,0 +1,71 @@
+# Web Framework
+streamlit==1.34.0
+tornado==6.4
+
+# Google Cloud and Vertex AI SDKs
+google-cloud-aiplatform==1.49.0
+vertexai==1.49.0
+google-auth==2.29.0
+google-cloud-core==2.4.1
+google-cloud-storage==2.16.0
+google-cloud-resource-manager==1.12.3
+google-cloud-bigquery==3.22.0
+
+# Other Google Cloud dependencies
+grpc-google-iam-v1==0.13.0
+grpcio==1.63.0
+grpcio-status==1.62.2
+proto-plus==1.23.0
+googleapis-common-protos==1.63.0
+google-crc32c==1.5.0
+google-resumable-media==2.7.0
+
+# Language Model Tools
+langchain==0.1.17
+langchain-community==0.0.37
+langchain-core==0.1.52
+langchain-text-splitters==0.0.1
+langsmith==0.1.55
+transformers==4.40.1
+tokenizers==0.19.1
+sentencepiece==0.2.0
+
+# Vector Database (Alternative to FAISS)
+chromadb==0.4.5
+
+# PDF Parsing
+PyPDF2==3.0.1
+
+# Data Processing
+pandas==2.2.2
+numpy==1.26.4
+
+# Visualization
+pydeck==0.9.0
+altair==5.3.0
+shapely==2.0.4
+
+# Utilities
+attrs==23.2.0
+packaging==23.2
+fsspec==2024.3.1
+filelock==3.14.0
+typing_extensions==4.11.0
+typing-inspect==0.9.0
+mypy-extensions==1.0.0
+pydantic==2.7.1
+requests==2.31.0
+six==1.16.0
+dataclasses-json==0.6.5
+protobuf==4.25.3
+markdown-it-py==3.0.0
+docstring_parser==0.16
+toml==0.10.2
+
+# Logging, Cache, and Other Tools
+cachetools==5.3.3
+blinker==1.8.1
+toolz==0.12.1
+rich==13.7.1
+watchdog==4.0.0
+click==8.1.7
