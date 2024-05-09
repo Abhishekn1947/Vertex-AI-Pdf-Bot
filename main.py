@@ -1,3 +1,8 @@
+#Check Requirements.txt and import the necessary packages. 
+#PDF Vertex AI Bot, 
+#Pros: Cheap to use. 
+#cons: A little slow, can use a better model to improve answer generation and performance, I've used "text-bison@001". You can kick it up a notch if you wish. 
+#Dm if you would like an Custom Industry Scalable version for your company with an even better fine-tuned model. 
 import os
 from google.cloud import aiplatform
 from PyPDF2 import PdfReader
@@ -10,6 +15,7 @@ import streamlit as st
 from typing import List
 
 # Correctly setting environment variables
+#Make sure to change the GCP Cred, Project_id, GCP Location Zone. 
 os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "path to your GCP Cred.json"
 project_id = "GCP ID"
 
