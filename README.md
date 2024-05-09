@@ -60,7 +60,11 @@ streamlit run (File Name).py
 -> Using the Application:
 * Access the running application via your browser.
 * Upload a PDF and ask questions using the provided input field.
- 
+
+# App 
+
+![Screenshot ](https://github.com/Abhishekn1947/Vertex-AI-Pdf-Bot/assets/134388969/3e200f25-83d5-442b-992e-7aa4b39ec012)
+
 # Conclusion
 Mr.DOC provides a streamlined, interactive way to gain insights from PDF documents using the power of Vertex AI. Adjust the parameters to refine responses, and explore new ways to enhance this project to meet your specific needs.
 
