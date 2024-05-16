@@ -47,6 +47,8 @@ Using the Application:
 📂 Upload a PDF and ask questions using the provided input field.
 🌐 Access the running application via your browser.
 
+![image](https://github.com/Abhishekn1947/Vertex-AI-Pdf-Bot/assets/134388969/f5b1c9b9-d00b-4571-959a-c8978c47ec1b)
+
 Upcoming updates: 
 1) TO read any kind of a file.
 2) consider images and tables as well and give answer in a structured table format as user requires 
