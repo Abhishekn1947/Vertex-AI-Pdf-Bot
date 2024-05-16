@@ -4,26 +4,59 @@
 #cons: A little slow, can use a better model to improve answer generation and performance, I've used "text-bison@001". You can kick it up a notch if you wish. 
 #Dm if you would like an Custom Industry Scalable version for your company with an even better fine-tuned model. 
 import os
-from google.cloud import aiplatform
+from datetime import datetime, timezone
+import streamlit as st
+from google.cloud import aiplatform, bigquery
 from PyPDF2 import PdfReader
 from langchain.text_splitter import CharacterTextSplitter
 from langchain_google_vertexai import VertexAI
 from langchain.chains import RetrievalQA
 from langchain_community.vectorstores import Chroma
-from langchain_community.output_parsers.rail_parser import GuardrailsOutputParser
-import streamlit as st
 from typing import List
 
-# Correctly setting environment variables
-#Make sure to change the GCP Cred, Project_id, GCP Location Zone. 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "path to your GCP Cred.json"
-project_id = "GCP ID"
+# Setting environment variables for Google Cloud Platform
+os.environ[
+    "GOOGLE_APPLICATION_CREDENTIALS"
+] = "**Link to your json cred**" (Replace these) 
+project_id = "**your project id**"
+location = "GCP location"
 
-# Initialize Vertex AI
-aiplatform.init(project=project_id, location="your GCP Zone")
+# Initialize Google Vertex AI and BigQuery Client
+aiplatform.init(project=project_id, location=location)
+bq_client = bigquery.Client()
 
 
-# Mock Embeddings Class Implementation
+# Function to create dataset and table if not exists
+def create_bigquery_dataset_table(dataset_id, table_id, schema):
+    dataset_ref = bq_client.dataset(dataset_id)
+    try:
+        bq_client.get_dataset(dataset_ref)
+    except Exception:
+        dataset = bigquery.Dataset(dataset_ref)
+        dataset.location = "US"
+        bq_client.create_dataset(dataset, exists_ok=True)
+
+    table_ref = dataset_ref.table(table_id)
+    try:
+        bq_client.get_table(table_ref)
+    except Exception:
+        table = bigquery.Table(table_ref, schema=schema)
+        bq_client.create_table(table, exists_ok=True)
+
+
+# Define the schema of the table
+schema = [
+    bigquery.SchemaField("question", "STRING", mode="REQUIRED"),
+    bigquery.SchemaField("answer", "STRING", mode="REQUIRED"),
+    bigquery.SchemaField("timestamp", "TIMESTAMP", mode="REQUIRED"),
+]
+
+# Create dataset and table
+dataset_id = "questions_answers"
+table_id = "conversations"
+create_bigquery_dataset_table(dataset_id, table_id, schema)
+
+# Mock implementation of an embeddings class
 class MockEmbeddings:
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
         return [[0.1] * 768 for _ in texts]
@@ -32,55 +65,70 @@ class MockEmbeddings:
         return [0.1] * 768
 
 
-# Instantiate the embeddings object
 embeddings = MockEmbeddings()
 
 # Streamlit UI setup
 st.set_page_config(page_title="Mr.DOC", page_icon="📄")
 st.header("Ask Your PDF 📄")
-
-# Upload PDF
 pdf = st.file_uploader("Upload your PDF", type="pdf")
 
 if pdf is not None:
-    # Extract text from the uploaded PDF
     pdf_reader = PdfReader(pdf)
     text = "".join([page.extract_text() for page in pdf_reader.pages])
-    text_splitter = CharacterTextSplitter(separator="\n", chunk_size=1000, chunk_overlap=200)
+    text_splitter = CharacterTextSplitter(
+        separator="\n", chunk_size=1000, chunk_overlap=200
+    )
     chunks = text_splitter.split_text(text)
 
     try:
-        # Create Chroma Index
         chroma_index = Chroma.from_texts(chunks, embeddings)
         retriever = chroma_index.as_retriever()
     except Exception as e:
         st.error(f"Failed to create Chroma index: {e}")
 
-    # Proceed only if the Chroma index was created successfully
-    if 'chroma_index' in locals():
+    if "chroma_index" in locals():
         st.sidebar.header("Model Parameters")
-        # Hyperparameters UI
-        temperature = st.sidebar.slider("Temperature (Randomness control)", 0.0, 1.0, 0.7,
-                                        help="Controls the randomness of the responses. Lower values make responses more deterministic.")
-        max_tokens = st.sidebar.slider("Max Tokens (Response length)", 50, 500, 150,
-                                       help="Sets the maximum number of tokens in the response. Adjust to increase or decrease response length.")
-        top_p = st.sidebar.slider("Top P (Token selection probability)", 0.0, 1.0, 1.0,
-                                  help="Controls the likelihood of token selection. Lower values focus on more likely tokens, reducing randomness.")
+        temperature = st.sidebar.slider("Temperature", 0.0, 1.0, 0.7)
+        max_tokens = st.sidebar.slider("Max Tokens", 50, 500, 150)
+        top_p = st.sidebar.slider("Top P", 0.0, 1.0, 1.0)
 
-        # Initialize the Vertex AI model for QA
-        llm = VertexAI(model="text-bison@001")
-        qa_chain = RetrievalQA.from_chain_type(llm, chain_type="stuff", retriever=retriever)
+        # Update LLM instantiation to use Gemini Pro
+        llm = VertexAI(
+            model_name="gemini-pro",
+            temperature=temperature,
+            max_output_tokens=max_tokens,
+            top_p=top_p,
+        )
+        qa_chain = RetrievalQA.from_chain_type(
+            llm, chain_type="stuff", retriever=retriever
+        )
 
-        # Conversation history
-        if 'history' not in st.session_state:
+        if "history" not in st.session_state:
             st.session_state.history = []
 
-        # Query input and response
-        query = st.text_input("Ask a question about your PDF")
-        if st.button("Ask"):
-            response = qa_chain.invoke(query, temperature=temperature, max_tokens=max_tokens, top_p=top_p)
-            st.session_state.history.append({"question": query, "answer": response})
+        query = st.text_input("Ask a question about your PDF", key="query_input")
+        if st.button("Ask", key="ask_button"):
+            response = qa_chain({"query": query})  # Adjust invocation for Gemini
+            # Ensure response is a string
+            response_str = response["result"] if response else ""
+            record = {
+                "question": query,
+                "answer": response_str,
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            st.session_state.history.append(record)
+            # Save to BigQuery
+            table_ref = f"{project_id}.{dataset_id}.{table_id}"
+            try:
+                response = bq_client.insert_rows_json(table_ref, [record])
+                if response:
+                    st.error(f"Insert contained errors: {response}")
+                else:
+                    st.success("Record successfully added to BigQuery.")
+            except Exception as e:
+                st.error(f"Failed to insert record into BigQuery: {e}")
 
-            for index, exchange in enumerate(st.session_state.history):
-                st.text_area("Q:", value=exchange["question"], height=50, disabled=True, key=f"question_{index}")
-                st.text_area("A:", value=exchange["answer"], height=100, disabled=True, key=f"answer_{index}")
+    st.write("Conversation History:")
+    for exchange in reversed(st.session_state.history):
+        st.text_area("Q:", value=exchange["question"], height=50, disabled=True)
+        st.text_area("A:", value=exchange["answer"], height=100, disabled=True)
