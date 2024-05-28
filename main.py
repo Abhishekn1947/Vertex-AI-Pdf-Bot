@@ -1,7 +1,7 @@
 #Check Requirements.txt and import the necessary packages. 
 #PDF Vertex AI Bot, 
 #Pros: Cheap to use. 
-#cons: A little slow, can use a better model to improve answer generation and performance, I've used "text-bison@001". You can kick it up a notch if you wish. 
+#cons: A little slow, can use a better model to improve answer generation and performance, I've used "gemini-pro". You can kick it up a notch if you wish. 
 #Dm if you would like an Custom Industry Scalable version for your company with an even better fine-tuned model. 
 import os
 from datetime import datetime, timezone
