@@ -1,6 +1,8 @@
 📄 Mr.DOC: Your PDF Q&A Assistant (POWER TO THE USER)
 🎉 Unlike ChatGPT or Gemini, Mr.DOC allows you to upload large PDF files (up to 200MB) and reads the entire document before answering your questions. Mainly keeps your data local and uses your Systems processing power to run the program. 
 
+Best of all, Its free to use. Dm me on www.abhisheknandakumar98.com if you would like a custom LLM. 
+
 -> This capability provides more accurate and comprehensive responses.
 -> The main merit of this project is that it allows the user to store the data locally, and allows the user to store the data on their own big query if they want to. Hence ensuring data privacy and not giving the AI companies access to your data. 
 -> I'm basically using their brain, but not storing the data on that brain. just using it. 
